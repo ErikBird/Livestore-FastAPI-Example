@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 import re
@@ -158,12 +159,20 @@ class Database:
 
                 events = []
                 for idx, row in enumerate(rows):
+                    # Handle legacy data where args might be JSON string
+                    args = row["args"]
+                    if isinstance(args, str):
+                        try:
+                            args = json.loads(args)
+                        except (json.JSONDecodeError, TypeError):
+                            pass  # Keep as string if can't parse
+                    
                     event = {
                         "eventEncoded": {
                             "seqNum": row["seq_num"],
                             "parentSeqNum": row["parent_seq_num"],
                             "name": row["name"],
-                            "args": row["args"],
+                            "args": args,
                             "clientId": row["client_id"],
                             "sessionId": row["session_id"],
                         },
