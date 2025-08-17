@@ -1,0 +1,56 @@
+# https://electric-sql.com/docs/guides/installation#using-docker
+name: "livestore-electric"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: electric
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    tmpfs:
+      - /var/lib/postgresql/data
+      - /tmp
+    command:
+      - -c
+      - listen_addresses=*
+      - -c
+      - wal_level=logical
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  electric:
+    image: electricsql/electric:latest
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/electric?sslmode=disable
+      ELECTRIC_SECRET: change-me-electric-secret
+    ports:
+      # We'll bind Electric to port 30000 in order to avoid conflicts with the dev server
+      - "30000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/electric?sslmode=disable
+      ELECTRIC_HOST: http://electric:3000  # Internal port 3000
+      ELECTRIC_API_SECRET: change-me-electric-secret
+      AUTH_TOKEN: insecure-token-change-me
+    depends_on:
+      - postgres
+      - electric
+    volumes:
+      # For development - mount source code
+      - ./server/src:/app/src
