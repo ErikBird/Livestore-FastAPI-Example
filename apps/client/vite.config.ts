@@ -12,4 +12,12 @@ export default defineConfig({
     vueDevTools(),
     livestoreDevtoolsPlugin({ schemaPath: './src/livestore/schema.ts' }),
   ],
+  server: {
+    fs: {
+      allow: [
+        // Allow serving files from workspace root to access shared node_modules
+        '../..',
+      ]
+    }
+  }
 })

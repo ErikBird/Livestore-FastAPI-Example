@@ -21,7 +21,7 @@ services:
       retries: 5
 
   fastapi:
-    build: ./server-python
+    build: ./apps/server
     container_name: livestore-fastapi
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/livestore
@@ -36,7 +36,7 @@ services:
     networks:
       - livestore-network
     volumes:
-      - ./server-python/app:/app/app # For development hot-reload
+      - ./apps/server/app:/app/app # For development hot-reload
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 networks:

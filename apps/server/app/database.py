@@ -235,12 +235,17 @@ class Database:
                     # Prepare values for bulk insert
                     values = []
                     for idx, event in enumerate(chunk):
+                        # Serialize args to JSON string for JSONB column
+                        args = event.get("args")
+                        if args is not None and not isinstance(args, str):
+                            args = json.dumps(args)
+                        
                         values.append(
                             (
                                 event["seq_num"],
                                 event["parent_seq_num"],
                                 event["name"],
-                                event.get("args"),  # JSONB column handles serialization
+                                args,
                                 created_at,
                                 event["client_id"],
                                 event["session_id"],
