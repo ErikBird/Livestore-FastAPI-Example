@@ -16,7 +16,7 @@ This is a monorepo for a LiveStore-based real-time application with a Vue.js fro
 
 ### Full System (Docker Compose)
 ```bash
-# Start all services (PostgreSQL + FastAPI)
+# Start all services (PostgreSQL + FastAPI + Caddy)
 docker-compose up -d
 
 # View logs

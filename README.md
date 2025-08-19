@@ -207,7 +207,7 @@ ADMIN_SECRET=admin-secret     # Admin operations
 - **Backend**: Python, FastAPI, asyncpg, bcrypt, PyJWT
 - **Database**: PostgreSQL 16
 - **Real-time**: WebSocket with @livestore/sync-cf protocol
-- **DevOps**: Docker, Docker Compose, Nginx
+- **DevOps**: Docker, Docker Compose, Caddy v2
 - **Authentication**: JWT with HS256, stateless
 
 ## Documentation
