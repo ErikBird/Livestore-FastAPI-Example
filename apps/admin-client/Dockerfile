@@ -1,0 +1,20 @@
+FROM node:20
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Clear npm cache and install dependencies with proper platform handling
+RUN npm cache clean --force && \
+    rm -rf node_modules package-lock.json && \
+    npm install
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 5173
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

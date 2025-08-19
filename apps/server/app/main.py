@@ -10,8 +10,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from dotenv import load_dotenv
 from app.database import db
+from app.user_database import UserDatabase
 from app.websocket_handler import WebSocketHandler, manager
 from app.auth import CustomAuthBackend, WebSocketAuth, BearerTokenAuth
+from app.jwt_auth import jwt_auth, jwt_bearer
+from app.api import auth as auth_api
+from app.api import admin as admin_api
 
 # Load environment variables from .env file
 load_dotenv()
@@ -40,6 +44,12 @@ async def lifespan(app: FastAPI):
         async with db.pool.acquire() as conn:
             result = await conn.fetchval("SELECT 1")
             logger.info(f"✅ Database connection test successful: {result}")
+        
+        # Create user database tables
+        user_db = UserDatabase(db.pool)
+        await user_db.create_tables()
+        logger.info("✅ User database tables initialized")
+        
     except Exception as e:
         logger.error(f"❌ Failed to initialize database: {e}")
         raise
@@ -80,6 +90,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include API routers
+app.include_router(auth_api.router)
+app.include_router(admin_api.router)
 
 
 @app.get("/")
