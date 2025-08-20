@@ -5,21 +5,32 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install uv via pip (more reliable in Docker)
+RUN pip install uv
 
-# Copy application code
-COPY app/ ./app/
-COPY init_admin.py .
-COPY startup.sh .
+# Create a non-root user
+RUN useradd -m -u 1000 appuser
 
-# Make startup script executable and create non-root user
-RUN chmod +x startup.sh && \
-    useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
+# Copy project configuration files from the server directory
+COPY --chown=appuser:appuser apps/server/pyproject.toml .
+
+# Copy the app directory first (needed for editable install)
+COPY --chown=appuser:appuser apps/server/app/ ./app/
+
+# Install dependencies using uv with pyproject.toml
+RUN uv pip install --system -e .
+
+# Copy startup script
+COPY --chown=appuser:appuser apps/server/startup.sh .
+
+# Copy .env file from project root (if it exists)
+COPY --chown=appuser:appuser .env* ./
+
+# Make startup script executable and switch to appuser
+RUN chmod +x startup.sh
 USER appuser
 
 # Expose port

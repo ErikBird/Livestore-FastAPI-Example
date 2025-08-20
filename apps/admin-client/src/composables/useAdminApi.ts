@@ -72,7 +72,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/users`)
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/users`)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -93,7 +93,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/users`, {
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/users`, {
         method: 'POST',
         body: JSON.stringify({
           email,
@@ -122,7 +122,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/workspaces`)
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/workspaces`)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -143,7 +143,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/workspaces/${workspaceId}`)
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/workspaces/${workspaceId}`)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -164,7 +164,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/workspaces`, {
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/workspaces`, {
         method: 'POST',
         body: JSON.stringify({
           name,
@@ -191,7 +191,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/workspaces/${workspaceId}/members`, {
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/workspaces/${workspaceId}/members`, {
         method: 'POST',
         body: JSON.stringify({
           user_email: userEmail,
@@ -218,7 +218,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/workspaces/${workspaceId}/members/${userId}`, {
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/workspaces/${workspaceId}/members/${userId}`, {
         method: 'DELETE'
       })
       
@@ -242,7 +242,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/stats`)
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/stats`)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -263,7 +263,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/users/${userId}`, {
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/users/${userId}`, {
         method: 'DELETE'
       })
       
@@ -286,7 +286,7 @@ export function useAdminApi() {
     error.value = null
 
     try {
-      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/admin/workspaces/${workspaceId}`, {
+      const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/v1/admin/workspaces/${workspaceId}`, {
         method: 'DELETE'
       })
       

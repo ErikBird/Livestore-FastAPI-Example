@@ -7,12 +7,12 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 import asyncpg
 import bcrypt
-from app.models import User, Workspace, WorkspaceMember, UserRole
+from .models import User, Workspace, WorkspaceMember, UserRole
 
 logger = logging.getLogger(__name__)
 
 
-class UserDatabase:
+class UserRepository:
     """Handles user, workspace and membership database operations"""
     
     def __init__(self, pool: asyncpg.Pool):

@@ -47,7 +47,40 @@ docker-compose logs -f
 
 ### Lokale Entwicklung
 
-#### Automatisches Setup
+#### Mit uv (Empfohlen)
+```bash
+# 1. uv installieren (falls nicht vorhanden)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 2. Dependencies installieren
+uv pip install -r requirements.txt
+
+# 3. PostgreSQL starten
+docker run -d \
+  --name postgres \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=livestore \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# 4. Development Server starten
+./run_dev.sh
+
+# Oder manuell:
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+#### Mit Admin User initialisieren
+```bash
+# Environment Variables setzen
+export ADMIN_EMAIL="admin@example.com"
+export ADMIN_PASSWORD="secure-password"
+
+# Dann Server starten
+./run_dev.sh
+```
+
+#### Automatisches Setup (Legacy)
 ```bash
 # 1. Setup Script ausführen
 python setup_dev.py
@@ -58,22 +91,7 @@ python setup_dev.py
 # - Startet PostgreSQL Container
 ```
 
-#### VS Code Development
-```bash
-# 1. VS Code öffnen
-code .
-
-# 2. Python Interpreter wählen: ./venv/bin/python
-
-# 3. Debugging starten (F5 oder Ctrl+Shift+P → "Debug: Start Debugging")
-#    Verfügbare Konfigurationen:
-#    - "Debug FastAPI Server" (direkt)
-#    - "Debug FastAPI Server (Production Mode)" (via uvicorn)
-
-# 4. Breakpoints setzen und debuggen
-```
-
-#### Manuelles Setup
+#### Manuelles Setup mit pip (Legacy)
 ```bash
 # 1. PostgreSQL starten (z.B. mit Docker)
 docker run -d \

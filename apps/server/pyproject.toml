@@ -1,0 +1,45 @@
+[project]
+name = "livestore-server"
+version = "2.0.0"
+description = "Python/FastAPI implementation compatible with @livestore/sync-cf"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.5",
+    "uvicorn[standard]==0.32.1",
+    "websockets==14.1",
+    "asyncpg==0.30.0",
+    "pydantic==2.10.3",
+    "pydantic-settings==2.1.0",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.12",
+    "bcrypt==4.1.2",
+    "PyJWT==2.8.0",
+    "email-validator==2.1.0.post1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==7.4.3",
+    "pytest-asyncio==0.21.1",
+    "httpx==0.25.2",
+    "black==23.11.0",
+    "pylint==3.0.3",
+    "mypy==1.7.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "httpx>=0.25.2",
+    "black>=23.11.0",
+    "pylint>=3.0.3",
+    "mypy>=1.7.1",
+]

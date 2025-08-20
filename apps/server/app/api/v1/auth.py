@@ -5,14 +5,15 @@ import logging
 from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr
+import asyncpg
 
-from app.database import db
-from app.user_database import UserDatabase
-from app.jwt_auth import jwt_auth, get_current_user_id, get_current_user_email
+from app.core.dependencies import get_db_pool
+from app.db.user_db import UserRepository
+from app.auth.jwt import JWTAuth, JWTBearer
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+router = APIRouter()
 
 
 class RegisterRequest(BaseModel):
@@ -54,9 +55,10 @@ async def register(request: RegisterRequest):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(request: LoginRequest):
+async def login(request: LoginRequest, pool: asyncpg.Pool = Depends(get_db_pool)):
     """Login with email and password"""
-    user_db = UserDatabase(db.pool)
+    jwt_auth = JWTAuth()
+    user_db = UserRepository(pool)
     
     # Get user by email
     user = await user_db.get_user_by_email(request.email)
@@ -100,8 +102,9 @@ async def login(request: LoginRequest):
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh_token(request: RefreshRequest):
+async def refresh_token(request: RefreshRequest, pool: asyncpg.Pool = Depends(get_db_pool)):
     """Refresh access token using refresh token"""
+    jwt_auth = JWTAuth()
     try:
         # Verify refresh token
         payload = jwt_auth.verify_refresh_token(request.refresh_token)
@@ -109,7 +112,7 @@ async def refresh_token(request: RefreshRequest):
         email = payload["email"]
         
         # Get updated user data
-        user_db = UserDatabase(db.pool)
+        user_db = UserRepository(pool)
         user = await user_db.get_user_by_id(user_id)
         
         if not user or not user.is_active:
@@ -144,11 +147,13 @@ async def refresh_token(request: RefreshRequest):
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
-    user_id: str = Depends(get_current_user_id),
-    email: str = Depends(get_current_user_email)
+    token_payload: Dict[str, Any] = Depends(JWTBearer()),
+    pool: asyncpg.Pool = Depends(get_db_pool)
 ):
     """Get current user information"""
-    user_db = UserDatabase(db.pool)
+    user_id = token_payload["sub"]
+    email = token_payload["email"]
+    user_db = UserRepository(pool)
     
     # Get user info
     user = await user_db.get_user_by_id(user_id)

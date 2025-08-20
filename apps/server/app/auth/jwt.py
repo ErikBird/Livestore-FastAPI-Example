@@ -1,13 +1,14 @@
 """
 JWT Authentication module for stateless authentication
 """
-import os
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any, List
 import jwt
-from fastapi import HTTPException, Request, status, Depends
+from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -16,16 +17,11 @@ class JWTAuth:
     """JWT authentication handler"""
     
     def __init__(self):
-        self.jwt_secret = os.getenv("JWT_SECRET", "change-me-jwt-secret-key")
-        self.jwt_refresh_secret = os.getenv("JWT_REFRESH_SECRET", "change-me-jwt-refresh-secret")
-        self.jwt_algorithm = "HS256"
-        self.access_token_expire_minutes = int(os.getenv("JWT_ACCESS_EXPIRY", "15"))
-        self.refresh_token_expire_days = int(os.getenv("JWT_REFRESH_EXPIRY", "7"))
-        
-        if self.jwt_secret == "change-me-jwt-secret-key":
-            logger.warning("⚠️  Using default JWT_SECRET - please set a secure secret in production!")
-        if self.jwt_refresh_secret == "change-me-jwt-refresh-secret":
-            logger.warning("⚠️  Using default JWT_REFRESH_SECRET - please set a secure secret in production!")
+        self.jwt_secret = settings.jwt_secret
+        self.jwt_refresh_secret = settings.jwt_secret + "-refresh"
+        self.jwt_algorithm = settings.jwt_algorithm
+        self.access_token_expire_minutes = settings.jwt_expiry_minutes
+        self.refresh_token_expire_days = 7
 
     def create_access_token(
         self, 
@@ -152,23 +148,5 @@ class JWTBearer(HTTPBearer):
         return None
 
 
-# Global JWT auth instance
-jwt_auth = JWTAuth()
-
-# Dependency for protected routes
-jwt_bearer = JWTBearer()
 
 
-def get_current_user_id(token_payload: Dict[str, Any] = Depends(jwt_bearer)) -> str:
-    """Get current user ID from JWT token"""
-    return token_payload["sub"]
-
-
-def get_current_user_email(token_payload: Dict[str, Any] = Depends(jwt_bearer)) -> str:
-    """Get current user email from JWT token"""
-    return token_payload["email"]
-
-
-def get_current_user_workspaces(token_payload: Dict[str, Any] = Depends(jwt_bearer)) -> List[Dict[str, Any]]:
-    """Get current user's workspaces from JWT token"""
-    return token_payload.get("workspaces", [])
